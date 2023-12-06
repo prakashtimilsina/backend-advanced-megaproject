@@ -6,6 +6,7 @@ const asyncHandler = (requestHandler) => {
 
 export { asyncHandler };
 
+//Alternative method:
 //Using Try Catch Block instead of PROMISE
 
 // const asyncHandler1 = () => {}
