@@ -4,6 +4,8 @@ import { User } from "../models/user.models.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 
+//Adding other features
+
 const registerUser = asyncHandler(async (req, res) => {
 
     //get user details from frontend
