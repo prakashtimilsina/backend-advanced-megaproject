@@ -29,7 +29,7 @@ router.route("/register").post(
 
 router.route("/login").post(loginUser)
 
-//Secure Routes - verifyJWT
+//Secure Routes - verifyJWT is used
 router.route("/logout").post(verifyJWT, logoutUser)
 router.route("/refreshtoken").post(refreshAccessToken)
 router.route("/change-password").post(verifyJWT, changeCurrentPassword)
