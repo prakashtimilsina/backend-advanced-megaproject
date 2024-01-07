@@ -151,8 +151,8 @@ const logoutUser = asyncHandler(async (req, res)=>{
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: undefined
+            $unset: {
+                refreshToken: 1  //This removes the field from document.
             }
         },
         {
@@ -248,18 +248,18 @@ const updateAccountDetails = asyncHandler(async(req, res)=>{
     if (!fullName || !email) {
         throw new ApiError(400, "All Fields are required.")
     }
-
-   const user = User.findByIdAndUpdate(
+    
+   const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
-                fullName: fullName,
+                fullName,
                 email,
             }
         },
         {new: true}
         ).select("-password")
-
+        
         return res
         .status(200)
         .json(new ApiResponse(200, user, "Account Details updated successfully"))
@@ -324,6 +324,7 @@ const getUserChannelProfile = asyncHandler(async(req, res)=>{
     if(!username?.trim()){
         throw new ApiError(400, "Username is missing")
     }
+    
    // User.find({username})
     const channel = await User.aggregate([
         {
@@ -333,7 +334,7 @@ const getUserChannelProfile = asyncHandler(async(req, res)=>{
         },
         {
             $lookup: {
-                from: "subcriptions",
+                from: "subscriptions",
                 localField: "_id",
                 foreignField: "channel",
                 as: "subscribers"
@@ -341,7 +342,7 @@ const getUserChannelProfile = asyncHandler(async(req, res)=>{
         },
         {     
             $lookup: {
-                from: "subcriptions",
+                from: "subscriptions",
                 localField: "_id",
                 foreignField: "subscriber",
                 as: "subscribedTo"
@@ -355,13 +356,16 @@ const getUserChannelProfile = asyncHandler(async(req, res)=>{
                 channelsSubscribedToCount:{
                     $size: "$subscribedTo"
                 },
-                isSubscribed: {
-                    $cond: {
+                isSubscribed: 
+                { $cond:
+                    {
                         if: {$in: [req.user?._id, "$subscribers.subscriber"]},
                         then: true,
-                        false: false
+                        else: false
                     }
                 }
+                    
+                
             }
         },
         {
